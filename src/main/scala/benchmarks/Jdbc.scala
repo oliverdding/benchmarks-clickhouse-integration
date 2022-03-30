@@ -41,8 +41,9 @@ class Jdbc {
       connection =
         DriverManager.getConnection("jdbc:clickhouse://127.0.0.1:9000")
       stmt = connection.createStatement
+      stmt.setMaxRows(0)
       rs = stmt.executeQuery(sql)
-      rs.next()
+      while(rs.next()){}
     } finally {
       if (rs != null) {
         rs.close()
