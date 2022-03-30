@@ -79,7 +79,7 @@ class Client {
                                  |FROM numbers($rowNumber)
                                  |FORMAT $dataFormat""".stripMargin
 
-  //client无法支持bytes传输自动解压。使用bytes必须手动解压。
+  //Client doesn't support auto decompression in ByteArray, that was too horrible for my situation.
 //  @Benchmark
   def fetchAndConsumeSync(bh: Blackhole): Unit = {
     val config = generateConfig()
