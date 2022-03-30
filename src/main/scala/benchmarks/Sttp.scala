@@ -7,17 +7,38 @@ import java.util.concurrent.TimeUnit
 
 @State(Scope.Thread)
 @BenchmarkMode(Array(Mode.AverageTime))
-@Warmup(iterations = 2, time = 1)
-@Measurement(iterations = 3, time = 3)
+@Warmup(iterations = 4, time = 3)
+@Measurement(iterations = 5, time = 3)
 @Threads(2)
 @Fork(1)
 @OutputTimeUnit(TimeUnit.MICROSECONDS)
 class Sttp {
 
+  var backend: SttpBackend[Identity, Any] = _
+
+  @Setup
+  def init(): Unit = {
+    backend = HttpURLConnectionBackend()
+  }
+
+  @TearDown
+  def definite(): Unit = {
+    backend.close()
+  }
+
   @Param(Array("100000", "5000000"))
   var rowNumber: Int = _
 
-  @Param(Array("Arrow", "ArrowStream", "Parquet"))
+  @Param(
+    Array(
+      "Arrow",
+      "ArrowStream",
+      "Parquet",
+      "Native",
+      "JSONCompactEachRow",
+      "RowBinary"
+    )
+  )
   var dataFormat: String = _
 
   @Param(Array("0", "1"))
@@ -40,7 +61,6 @@ class Sttp {
   @Benchmark
   def fetchAndConsumeSync(bh: Blackhole): Unit = {
     val sql = generateSql()
-    lazy val backend: SttpBackend[Identity, Any] = HttpURLConnectionBackend()
     val response = basicRequest
       .post(
         uri"http://127.0.0.1:8123/?enable_http_compression=${compressionEnabled}"
@@ -60,6 +80,5 @@ class Sttp {
         x
     }
     bh.consume(res)
-    backend.close()
   }
 }
