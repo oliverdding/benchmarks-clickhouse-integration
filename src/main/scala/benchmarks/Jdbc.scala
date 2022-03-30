@@ -42,18 +42,7 @@ class Jdbc {
         DriverManager.getConnection("jdbc:clickhouse://127.0.0.1:9000")
       stmt = connection.createStatement
       rs = stmt.executeQuery(sql)
-      while (rs.next()) {
-        bh.consume(rs.getString(1))
-        bh.consume(rs.getString(2))
-        bh.consume(rs.getString(3))
-        bh.consume(rs.getString(4))
-        bh.consume(rs.getString(5))
-        bh.consume(rs.getInt(6))
-        bh.consume(rs.getInt(7))
-        bh.consume(rs.getInt(8))
-        bh.consume(rs.getInt(9))
-        bh.consume(rs.getInt(10))
-      }
+      rs.next()
     } finally {
       if (rs != null) {
         rs.close()

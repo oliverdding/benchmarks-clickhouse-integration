@@ -14,10 +14,10 @@ import java.util.concurrent.TimeUnit
 @OutputTimeUnit(TimeUnit.MICROSECONDS)
 class Sttp {
 
-  @Param(Array("1000000", "100000000"))
+  @Param(Array("100000", "5000000"))
   var rowNumber: Int = _
 
-  @Param(Array("ArrowStream", "Parquet"))
+  @Param(Array("Arrow", "ArrowStream", "Parquet"))
   var dataFormat: String = _
 
   @Param(Array("0", "1"))
