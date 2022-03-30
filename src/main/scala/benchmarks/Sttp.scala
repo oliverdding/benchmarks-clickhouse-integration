@@ -38,7 +38,7 @@ class Sttp {
                                 |FORMAT $dataFormat""".stripMargin
 
   @Benchmark
-  def fetchAndConsumeZipSync(bh: Blackhole): Unit = {
+  def fetchAndConsumeSync(bh: Blackhole): Unit = {
     val sql = generateSql()
     lazy val backend: SttpBackend[Identity, Any] = HttpURLConnectionBackend()
     val response = basicRequest

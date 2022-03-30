@@ -1,13 +1,17 @@
 package tests
 
 import akka.actor.ActorSystem
+import akka.stream.scaladsl.Sink
 import com.crobox.clickhouse.ClickhouseClient
 import com.typesafe.config.{Config, ConfigFactory}
 import org.scalatest.funsuite.AnyFunSuite
 
+import java.io.{ByteArrayInputStream, ByteArrayOutputStream}
+import java.util.zip.{GZIPInputStream, GZIPOutputStream}
 import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.DurationInt
+import scala.language.postfixOps
 
 class ClientTest extends AnyFunSuite {
 
@@ -38,7 +42,7 @@ class ClientTest extends AnyFunSuite {
                    |        user = "default"
                    |        password = ""
                    |      }
-                   |      # profile = "default"
+                   |      profile = "default"
                    |      http-compression = true
                    |      custom {
                    |      }
@@ -56,6 +60,36 @@ class ClientTest extends AnyFunSuite {
     val client = new ClickhouseClient(Some(config))
     val future = client
       .query("SELECT version()")
-    Await.result(future, 1.second)
+      .map(ver => println(ver))
+    Await.ready(future, 3 seconds)
+  }
+
+  test("client compression test sync") {
+    val client = new ClickhouseClient(Some(config))
+    val future = client
+      .query(
+        """
+          |SELECT
+          |    randomPrintableASCII(128),
+          |    toInt32(rand())
+          |FROM numbers(3)
+          |FORMAT JSON
+          |""".stripMargin
+      ).map(ver => println(ver))
+    Await.ready(future, 3 seconds)
+  }
+
+  test("client compression test async") {
+    val client = new ClickhouseClient(Some(config))
+    val future = client
+      .sourceByteString(
+        """
+          |SELECT
+          |    randomPrintableASCII(128),
+          |    toInt32(rand())
+          |FORMAT JSON
+          |""".stripMargin
+      ).map(ver => println(ver))
+    Await.ready(future, 3 seconds)
   }
 }
