@@ -82,7 +82,7 @@ class ClientTest extends AnyFunSuite {
   test("client compression test async") {
     val client = new ClickhouseClient(Some(config))
     val future = client
-      .sourceByteString(
+      .query(
         """
           |SELECT
           |    randomPrintableASCII(128),
