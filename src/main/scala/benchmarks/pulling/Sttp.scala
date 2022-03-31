@@ -27,7 +27,7 @@ class Sttp {
     backend.close()
   }
 
-  @Param(Array("100000", "5000000"))
+  @Param(Array("100000"))
   var rowNumber: Int = _
 
   @Param(
@@ -36,7 +36,6 @@ class Sttp {
       "ArrowStream",
       "Parquet",
       "Native",
-      "JSONCompactEachRow",
       "RowBinary"
     )
   )

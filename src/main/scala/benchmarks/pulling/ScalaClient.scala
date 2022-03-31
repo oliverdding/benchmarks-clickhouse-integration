@@ -11,8 +11,8 @@ import java.util.concurrent.TimeUnit
 
 @State(Scope.Thread)
 @BenchmarkMode(Array(Mode.AverageTime))
-@Warmup(iterations = 2, time = 1)
-@Measurement(iterations = 3, time = 3)
+@Warmup(iterations = 5, time = 3)
+@Measurement(iterations = 8, time = 6)
 @Threads(1)
 @Fork(1)
 @OutputTimeUnit(TimeUnit.MICROSECONDS)

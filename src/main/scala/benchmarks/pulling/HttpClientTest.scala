@@ -1,7 +1,6 @@
 package benchmarks.pulling
 
 import com.clickhouse.client._
-import org.apache.log4j.BasicConfigurator
 import org.openjdk.jmh.annotations._
 import org.openjdk.jmh.infra.Blackhole
 
@@ -9,8 +8,8 @@ import java.util.concurrent.TimeUnit
 
 @State(Scope.Thread)
 @BenchmarkMode(Array(Mode.AverageTime))
-@Warmup(iterations = 2, time = 1)
-@Measurement(iterations = 3, time = 3)
+@Warmup(iterations = 5, time = 3)
+@Measurement(iterations = 8, time = 6)
 @Threads(1)
 @Fork(1)
 @OutputTimeUnit(TimeUnit.MICROSECONDS)
@@ -19,7 +18,7 @@ class HttpClientTest {
   @Param(Array("100000", "5000000"))
   var rowNumber: Int = _
 
-  @Param(Array("RowBinary", "Native"))
+  @Param(Array("RowBinary"))
   var dataFormat: String = _
 
   def generateSql(): String = s"""SELECT
@@ -63,7 +62,7 @@ class HttpClientTest {
       .execute()
       .get()
 
-    response.records().forEach(r => bh.consume(r))
+    response.records().forEach(r => r.forEach(v => bh.consume(v)))
 
     client.close()
   }
