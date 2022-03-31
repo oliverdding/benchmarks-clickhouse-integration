@@ -1,4 +1,5 @@
-package benchmarks
+package benchmarks.pulling
+
 import org.openjdk.jmh.annotations._
 import org.openjdk.jmh.infra.Blackhole
 import sttp.client3._
@@ -59,7 +60,7 @@ class Sttp {
                                 |FORMAT $dataFormat""".stripMargin
 
   @Benchmark
-  def fetchAndConsumeSync(bh: Blackhole): Unit = {
+  def fetchSync(bh: Blackhole): Unit = {
     val sql = generateSql()
     val response = basicRequest
       .post(

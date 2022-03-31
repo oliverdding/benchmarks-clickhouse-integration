@@ -13,7 +13,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.DurationInt
 import scala.language.postfixOps
 
-class ClientTest extends AnyFunSuite {
+class ScalaClientTest extends AnyFunSuite {
 
   implicit val system: ActorSystem = ActorSystem.create("ClientTest")
 
@@ -56,7 +56,7 @@ class ClientTest extends AnyFunSuite {
                    |}
                    |""".stripMargin)
 
-  test("client connection test") {
+  test("scala client connection test") {
     val client = new ClickhouseClient(Some(config))
     val future = client
       .query("SELECT version()")
@@ -64,7 +64,7 @@ class ClientTest extends AnyFunSuite {
     Await.ready(future, 3 seconds)
   }
 
-  test("client compression test sync") {
+  test("scala client compression test sync") {
     val client = new ClickhouseClient(Some(config))
     val future = client
       .query(
@@ -79,7 +79,7 @@ class ClientTest extends AnyFunSuite {
     Await.ready(future, 3 seconds)
   }
 
-  test("client compression test async") {
+  test("scala client compression test async") {
     val client = new ClickhouseClient(Some(config))
     val future = client
       .query(

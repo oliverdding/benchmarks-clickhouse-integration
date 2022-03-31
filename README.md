@@ -13,9 +13,14 @@ When pull data from clickhouse to spark, the process can be divided into two par
 
 And at this time(2022-03-30), There are three ways for integrating:
 
-1. clickhouse-jdbc(too slow, but may be useful when 0.3.3 released with TCP support)
+1. official clickhouse-jdbc
+   1. jdbc (too slow, ignore)
+   2. http client (only support row based format right now)
+   3. gRPC client (not stable yet, ignore)
+   4. tcp client (not release yet, ignore)
 2. ClickHouse-Native-JDBC
-3. build from scratch with HTTP
+3. clickhouse-scala-client (not stable yet, ignore)
+4. build from scratch with HTTP (I choose sttp library)
 
 When using HTTP, there are so many data format to choose:
 
@@ -26,7 +31,7 @@ When using HTTP, there are so many data format to choose:
 5. JSONCompactEachRow(good choice for streaming mode)
 6. RowBinary(good choice that combine the advantages of streaming ability and efficiency)
 
-So this project are arisen, meant to find out the best choice...
+So this project are arisen, meant to find out the **fastest choice**...
 
 ## Usage
 

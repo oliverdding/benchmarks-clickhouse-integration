@@ -1,4 +1,4 @@
-package benchmarks
+package benchmarks.pulling
 
 import org.openjdk.jmh.annotations._
 import org.openjdk.jmh.infra.Blackhole
@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit
 @Threads(2)
 @Fork(1)
 @OutputTimeUnit(TimeUnit.MICROSECONDS)
-class Jdbc {
+class ThirdPartyJdbc {
 
   @Param(Array("100000", "5000000"))
   var rowNumber: Int = _
@@ -32,7 +32,7 @@ class Jdbc {
                                 |FROM numbers($rowNumber)""".stripMargin
 
   @Benchmark
-  def fetchAndConsume(bh: Blackhole): Unit = {
+  def fetch(bh: Blackhole): Unit = {
     val sql = generateSql()
     var connection: Connection = null
     var stmt: Statement = null

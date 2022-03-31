@@ -4,8 +4,8 @@ import org.scalatest.funsuite.AnyFunSuite
 
 import java.sql.{Connection, DriverManager, ResultSet, Statement}
 
-class JdbcTest extends AnyFunSuite {
-  test("jdbc connection test") {
+class ThirdPartyJdbcTest extends AnyFunSuite {
+  test("third party jdbc connection test") {
     var connection: Connection = null
     var stmt: Statement = null
     var rs: ResultSet = null

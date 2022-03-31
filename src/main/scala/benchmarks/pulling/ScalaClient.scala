@@ -1,4 +1,4 @@
-package benchmarks
+package benchmarks.pulling
 
 import akka.actor.ActorSystem
 import akka.stream.scaladsl.Sink
@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit
 @Threads(1)
 @Fork(1)
 @OutputTimeUnit(TimeUnit.MICROSECONDS)
-class Client {
+class ScalaClient {
 
   implicit val system: ActorSystem = ActorSystem.create("ClientTest")
 
@@ -81,7 +81,7 @@ class Client {
 
   //Client doesn't support auto decompression in ByteArray, that was too horrible for my situation.
 //  @Benchmark
-  def fetchAndConsumeSync(bh: Blackhole): Unit = {
+  def fetchAndDecompressSync(bh: Blackhole): Unit = {
     val config = generateConfig()
     val sql = generateSql()
 
