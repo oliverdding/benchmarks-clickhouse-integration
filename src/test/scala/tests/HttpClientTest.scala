@@ -68,8 +68,16 @@ class HttpClientTest extends AnyFunSuite {
       .query("""
                |SELECT
                |    randomPrintableASCII(128),
+               |    randomPrintableASCII(128),
+               |    randomPrintableASCII(128),
+               |    randomPrintableASCII(128),
+               |    randomPrintableASCII(128),
+               |    toInt32(rand()),
+               |    toInt32(rand()),
+               |    toInt32(rand()),
+               |    toInt32(rand()),
                |    toInt32(rand())
-               |FROM numbers(10)
+               |FROM numbers(100)
                |FORMAT RowBinary""".stripMargin)
       .execute()
       .get()

@@ -8,9 +8,9 @@ import java.util.concurrent.TimeUnit
 
 @State(Scope.Thread)
 @BenchmarkMode(Array(Mode.AverageTime))
-@Warmup(iterations = 5, time = 3)
-@Measurement(iterations = 8, time = 6)
-@Threads(1)
+@Warmup(iterations = 4, time = 3)
+@Measurement(iterations = 5, time = 3)
+@Threads(2)
 @Fork(1)
 @OutputTimeUnit(TimeUnit.MICROSECONDS)
 class HttpClientTest {
@@ -54,15 +54,26 @@ class HttpClientTest {
         .connect(server)
         .asInstanceOf[ClickHouseRequest[
           _ <: ClickHouseRequest[
-            _ <: ClickHouseRequest[_]
+            _ <: ClickHouseRequest[_ <: ClickHouseRequest[_]]
           ]
         ]]
     val response: ClickHouseResponse = request
+      .compressServerResponse(true)
+      .format(ClickHouseFormat.RowBinary) // TODO: If you want to add format, here is a trap
       .query(sql)
       .execute()
       .get()
 
-    response.records().forEach(r => r.forEach(v => bh.consume(v)))
+    var cnt = 0
+    response
+      .records()
+      .forEach(r =>
+        r.forEach(v => {
+          cnt += 1
+          bh.consume(v)
+        })
+      )
+    println(s"TAG ${cnt}")
 
     client.close()
   }
