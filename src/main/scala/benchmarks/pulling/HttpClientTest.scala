@@ -58,13 +58,7 @@ class HttpClientTest {
       .execute()
       .get()
 
-    response
-      .records()
-      .forEach(r =>
-        r.forEach(v => {
-          bh.consume(v)
-        })
-      )
+    bh.consume(response)
 
     client.close()
   }
