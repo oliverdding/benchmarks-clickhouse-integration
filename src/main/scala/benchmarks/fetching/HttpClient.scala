@@ -1,4 +1,4 @@
-package benchmarks.pulling
+package benchmarks.fetching
 
 import com.clickhouse.client._
 import org.openjdk.jmh.annotations._
@@ -13,13 +13,16 @@ import java.util.concurrent.TimeUnit
 @Threads(2)
 @Fork(1)
 @OutputTimeUnit(TimeUnit.MICROSECONDS)
-class HttpClientTest {
+class HttpClient {
 
   @Param(Array("100000", "1000000"))
   var rowNumber: Int = _
 
   @Param(Array("RowBinaryWithNamesAndTypes"))
   var dataFormat: String = _
+
+  @Param(Array("false", "true"))
+  var compressionEnabled: Boolean = _
 
   def generateSql(): String = s"""SELECT
                                  |    randomPrintableASCII(10),
@@ -50,7 +53,7 @@ class HttpClientTest {
           ]
         ]]
     val response: ClickHouseResponse = request
-      .compressServerResponse(true)
+      .compressServerResponse(compressionEnabled)
       .format(
         ClickHouseFormat.RowBinaryWithNamesAndTypes
       ) // TODO: If you want to add format, here is a trap
@@ -58,7 +61,12 @@ class HttpClientTest {
       .execute()
       .get()
 
-    bh.consume(response)
+    val buf =
+      new Array[Byte](
+        20000000
+      ) // TODO: If you want to expand row number, here is a trap
+    response.getInputStream.read(buf)
+    bh.consume(buf)
 
     client.close()
   }

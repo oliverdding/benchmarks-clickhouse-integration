@@ -1,4 +1,4 @@
-package benchmarks.pulling
+package benchmarks.fetching
 
 import akka.actor.ActorSystem
 import akka.stream.scaladsl.Sink

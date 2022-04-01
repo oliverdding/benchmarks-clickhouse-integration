@@ -69,18 +69,17 @@ class HttpClientTest extends AnyFunSuite {
                |SELECT
                |    randomPrintableASCII(10),
                |    toInt32(rand())
-               |FROM numbers(100)
+               |FROM numbers(1000000)
                |FORMAT RowBinaryWithNamesAndTypes""".stripMargin)
       .execute()
       .get()
 
-    var cnt = 0
+    var cnt = 0L
     response
       .records()
       .forEach(r =>
         r.forEach(v => {
-          cnt += 1
-          println(v.asString())
+          cnt += v.asBinary().length
         })
       )
     println(cnt)

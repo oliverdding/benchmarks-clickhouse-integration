@@ -1,10 +1,15 @@
-package benchmarks.pulling
+package benchmarks.parsing
 
+import org.apache.arrow.memory.RootAllocator
+import org.apache.arrow.vector.ipc.ArrowStreamReader
+import org.apache.spark.sql.vectorized.{ArrowColumnVector, ColumnVector, ColumnarBatch}
 import org.openjdk.jmh.annotations._
 import org.openjdk.jmh.infra.Blackhole
 import sttp.client3._
 
+import java.io.ByteArrayInputStream
 import java.util.concurrent.TimeUnit
+import scala.collection.convert.ImplicitConversions.`iterator asScala`
 
 @State(Scope.Thread)
 @BenchmarkMode(Array(Mode.AverageTime))
@@ -30,17 +35,6 @@ class Sttp {
   @Param(Array("100000", "1000000"))
   var rowNumber: Int = _
 
-  @Param(
-    Array(
-      "Arrow",
-      "ArrowStream",
-      "Parquet",
-      "Native",
-      "RowBinary"
-    )
-  )
-  var dataFormat: String = _
-
   @Param(Array("0", "1"))
   var compressionEnabled: String = _
 
@@ -48,14 +42,14 @@ class Sttp {
                                 |    randomPrintableASCII(10),
                                 |    toInt32(rand())
                                 |FROM numbers($rowNumber)
-                                |FORMAT $dataFormat""".stripMargin
+                                |FORMAT ArrowStream""".stripMargin
 
   @Benchmark
   def fetchSync(bh: Blackhole): Unit = {
     val sql = generateSql()
     val response = basicRequest
       .post(
-        uri"http://127.0.0.1:8123/?enable_http_compression=${compressionEnabled}"
+        uri"http://127.0.0.1:8123/?enable_http_compression=$compressionEnabled"
       )
       .auth
       .basic("default", "")
@@ -65,12 +59,28 @@ class Sttp {
       .body(sql)
       .send(backend)
 
-    val res = response.body match {
+    val bytes = response.body match {
       case Left(x) =>
         throw new Exception(x)
       case Right(x) =>
         x
     }
-    bh.consume(res)
+
+    val allocator = new RootAllocator(Long.MaxValue)
+    val reader =
+      new ArrowStreamReader(new ByteArrayInputStream(bytes), allocator)
+    val root = reader.getVectorSchemaRoot
+
+    while (reader.loadNextBatch()) {
+      val arrowVectorIterator = root.getFieldVectors.iterator()
+      val sparkVectors =
+        arrowVectorIterator
+          .map[ColumnVector] { arrowVector =>
+            new ArrowColumnVector(arrowVector)
+          }
+          .toArray
+
+      bh.consume(new ColumnarBatch(sparkVectors, root.getRowCount))
+    }
   }
 }

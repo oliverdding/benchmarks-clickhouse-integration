@@ -1,4 +1,4 @@
-package benchmarks.pulling
+package benchmarks.fetching
 
 import org.openjdk.jmh.annotations._
 import org.openjdk.jmh.infra.Blackhole
