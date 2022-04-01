@@ -65,7 +65,6 @@ class HttpClientTest {
           bh.consume(v)
         })
       )
-    println(s"TAG ${cnt}")
 
     client.close()
   }
