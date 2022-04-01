@@ -15,19 +15,11 @@ import java.util.concurrent.TimeUnit
 @OutputTimeUnit(TimeUnit.MICROSECONDS)
 class ThirdPartyJdbc {
 
-  @Param(Array("100000", "5000000"))
+  @Param(Array("100000", "1000000"))
   var rowNumber: Int = _
 
   def generateSql(): String = s"""SELECT
-                                |    randomPrintableASCII(128),
-                                |    randomPrintableASCII(128),
-                                |    randomPrintableASCII(128),
-                                |    randomPrintableASCII(128),
-                                |    randomPrintableASCII(128),
-                                |    toInt32(rand()),
-                                |    toInt32(rand()),
-                                |    toInt32(rand()),
-                                |    toInt32(rand()),
+                                |    randomPrintableASCII(10),
                                 |    toInt32(rand())
                                 |FROM numbers($rowNumber)""".stripMargin
 
