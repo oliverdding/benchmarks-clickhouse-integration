@@ -64,25 +64,26 @@ class HttpClientTest extends AnyFunSuite {
         ]]
     val response = request
       .compressServerResponse(true)
-      .format(ClickHouseFormat.RowBinary)
+      .format(ClickHouseFormat.RowBinaryWithNamesAndTypes)
       .query("""
                |SELECT
-               |    randomPrintableASCII(128),
-               |    randomPrintableASCII(128),
-               |    randomPrintableASCII(128),
-               |    randomPrintableASCII(128),
-               |    randomPrintableASCII(128),
-               |    toInt32(rand()),
-               |    toInt32(rand()),
-               |    toInt32(rand()),
-               |    toInt32(rand()),
+               |    randomPrintableASCII(10),
                |    toInt32(rand())
                |FROM numbers(100)
-               |FORMAT RowBinary""".stripMargin)
+               |FORMAT RowBinaryWithNamesAndTypes""".stripMargin)
       .execute()
       .get()
 
-    response.pipe(System.out, 0)
+    var cnt = 0
+    response
+      .records()
+      .forEach(r =>
+        r.forEach(v => {
+          cnt += 1
+          println(v.asString())
+        })
+      )
+    println(cnt)
 
     client.close()
   }

@@ -18,7 +18,7 @@ class HttpClientTest {
   @Param(Array("100000", "1000000"))
   var rowNumber: Int = _
 
-  @Param(Array("RowBinary"))
+  @Param(Array("RowBinaryWithNamesAndTypes"))
   var dataFormat: String = _
 
   def generateSql(): String = s"""SELECT
@@ -51,17 +51,17 @@ class HttpClientTest {
         ]]
     val response: ClickHouseResponse = request
       .compressServerResponse(true)
-      .format(ClickHouseFormat.RowBinary) // TODO: If you want to add format, here is a trap
+      .format(
+        ClickHouseFormat.RowBinaryWithNamesAndTypes
+      ) // TODO: If you want to add format, here is a trap
       .query(sql)
       .execute()
       .get()
 
-    var cnt = 0
     response
       .records()
       .forEach(r =>
         r.forEach(v => {
-          cnt += 1
           bh.consume(v)
         })
       )
